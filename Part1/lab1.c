@@ -61,7 +61,7 @@ void part1() {
 
   // Q1: The following line is an example. Feel free to
   // copy and/or modify it as needed for part 1 of this lab.
-  printf("x & x = %i\n %x", x & x, &x);
+  printf("x & x = %i\n %p", x & x, &x);
 }
 
 // HELPER FUNCTION - fillArray()
@@ -108,6 +108,8 @@ void part2() {
 
   // Q2.1: What happens if the second argument is greater
   // than the size of the array (10)?
+
+  // ans: Stack smashing.
   fillArray(array, 10);
 
   int value = 295;
@@ -121,6 +123,10 @@ void part2() {
   // as if it were an array of a single element. What data
   // is stored in value after the following code executes?
   // Explain why the result is what it is.
+
+  // Value will have an int data type with the value of 2. When the fillArray function is called,
+  // Value is treated as a single element array, and the function behaves as intended, executing
+  // array[0] = 0 * 3 + 2 which results in 2, which is then stored in value. 
   fillArray(&value, 1);
 }
 
@@ -184,7 +190,7 @@ void part3() {
   // Order of operations can be confusing, so parentheses
   // generally improve readability.
 
-  // assert( student == 8 );
+  assert(((int *)&student)[2] == 8 );
 }
 
 // HELPER FUNCTION - bigArrayIndex()
@@ -227,6 +233,20 @@ void part4() {
       }
     }
   }
+  
+
+  // The original ordering of "ijk" is the fastest as K changes the fastest in a 3d Array
+  // so K should be placed in the inner most loop to mirror how memory is allocated, while
+  // loop I tried, which was "KJI" ordering, it is almost twice slower as K is placed on the
+  // outermost for loop, which requires a huge jump in memory each time.
+
+  /* for (int k = 0; k < SIZE; k++) {
+    for (int j = 0; j < SIZE; j++) {
+      for (int i = 0; i < SIZE; i++) {
+        bigArray[bigArrayIndex(i, j, k)] = i + j + k;
+      }
+    }
+  } very significantly slower */
 
   // stop timer and print result
   printf("Approximate runtime = %d\n", (int)(clock() - timer));
@@ -260,6 +280,15 @@ void part5() {
   // Valgrind is a tool for analyzing how programs
   // use memory, which is often invaluable for C and
   // C++ programming.
+
+  // Small correction (?), instead of "valgrind ./lab0 5", i think its supposed to be
+  // "valgrind ./lab1.bin 5", and without freeing the memory, valgrind returns that
+  // 80 bytes are still in the HEAP and not cleared, which makes sense as we did
+  // malloc(sizeof(Scores)) * 5. Each Scores struct has 4 int fields, 
+  // and each int is 4 bytes, so the size of each struct is 4 * 4 = 16 bytes.
+  // 16 * 5 = 80 bytes in memory allocated that is not freed up which is equal to what
+  // Valgrind reported.
+  
   free(class_grades);
 }
 
